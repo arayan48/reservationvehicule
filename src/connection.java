@@ -12,7 +12,6 @@ public class connection {
         try {
             this.conn = DriverManager.getConnection(url, user, passwd);
         } catch (Exception e) {
-            // Connexion échouée, conn restera null
         }
     }
 
@@ -26,7 +25,6 @@ public class connection {
                 conn.close();
             }
         } catch (SQLException e) {
-            // Erreur lors de la fermeture, ignorée silencieusement
         }
     }
 

@@ -1,21 +1,45 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class connection {
-    String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
-    String user = "rayan";
-    String passwd = "Rayan789";
+    private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
+    private String user = "rayan";
+    private String passwd = "Rayan789";
+    private Connection conn;
 
     public connection() {
         try {
-            Connection conn = DriverManager.getConnection(url, user, passwd);
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("Connexion effective !");
-            } else {
-                System.out.println("Échec de la connexion !");
-            }
+            this.conn = DriverManager.getConnection(url, user, passwd);
         } catch (Exception e) {
-            System.out.println("Erreur de connexion : " + e.getMessage());
+            // Connexion échouée, conn restera null
+        }
+    }
+
+    public Connection getConnection() {
+        return this.conn;
+    }
+
+    public void closeConnection() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            // Erreur lors de la fermeture, ignorée silencieusement
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                return "Connexion active : " + url + " | Utilisateur : " + user + " | Statut : CONNECTÉ";
+            } else {
+                return "Connexion inactive : " + url + " | Utilisateur : " + user + " | Statut : FERMÉE";
+            }
+        } catch (SQLException e) {
+            return "Erreur de connexion : " + url + " | Utilisateur : " + user + " | Erreur : " + e.getMessage();
         }
     }
 }

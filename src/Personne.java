@@ -11,12 +11,12 @@ public class Personne {
     private String matricule;
     private String  nom;
     private String telephone;
+    private Service unService;
 
     public Personne(String matricule, String nom, String telephone) {
         this.matricule = matricule;
         this.nom = nom;
         this.telephone = telephone;
-        //super(num_service);
     }
     
     @Override
@@ -53,4 +53,3 @@ public class Personne {
     
     
 }
-

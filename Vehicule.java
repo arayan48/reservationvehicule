@@ -8,13 +8,13 @@ package reservation_vehicule;
  *
  * @author pc128
  */
-public class Vehicule extends Type {
+public class Vehicule {
     private int immat;
     private String marque;
     private String modele;
+    private Type unType;
 
     public Vehicule(int immat, String marque, String modele) {
-        super(numero, libelle);
         this.immat = immat;
         this.marque = marque;
         this.modele = modele;

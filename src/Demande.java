@@ -1,4 +1,4 @@
-public class demande {
+public class Demande {
     private String datereserv;
     private int numero;
     private String datedebyt;
@@ -9,7 +9,7 @@ public class demande {
     private String dateretoureffectif;
     private String etat;
 
-    public demande(String datereserv, int numero, String datedebyt, Personne personne, String notype, Vehicule vehicule,
+    public Demande(String datereserv, int numero, String datedebyt, Personne personne, String notype, Vehicule vehicule,
             int duree, String dateretoureffectif, String etat) {
         this.datereserv = datereserv;
         this.numero = numero;
@@ -96,7 +96,7 @@ public class demande {
 
     @Override
     public String toString() {
-        return "demande [datereserv=" + datereserv + ", numero=" + numero + ", datedebyt=" + datedebyt + ", personne="
+        return "Demande [datereserv=" + datereserv + ", numero=" + numero + ", datedebyt=" + datedebyt + ", personne="
                 + personne + ", notype=" + notype + ", vehicule=" + vehicule + ", duree=" + duree
                 + ", dateretoureffectif="
                 + dateretoureffectif + ", etat=" + etat + "]";

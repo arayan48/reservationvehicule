@@ -2,20 +2,21 @@ public class demande {
     private String datereserv;
     private int numero;
     private String datedebyt;
-    private String matricule;
+    private Personne personne;
     private String notype;
-    private String immat;
+    private Vehicule vehicule;
     private int duree;
     private String dateretoureffectif;
     private String etat;
 
-    public demande(String datereserv, int numero, String datedebyt, String matricule, String notype, String immat, int duree, String dateretoureffectif, String etat) {
+    public demande(String datereserv, int numero, String datedebyt, Personne personne, String notype, Vehicule vehicule,
+            int duree, String dateretoureffectif, String etat) {
         this.datereserv = datereserv;
         this.numero = numero;
         this.datedebyt = datedebyt;
-        this.matricule = matricule;
+        this.personne = personne;
         this.notype = notype;
-        this.immat = immat;
+        this.vehicule = vehicule;
         this.duree = duree;
         this.dateretoureffectif = dateretoureffectif;
         this.etat = etat;
@@ -45,12 +46,12 @@ public class demande {
         this.datedebyt = datedebyt;
     }
 
-    public String getMatricule() {
-        return matricule;
+    public Personne getPersonne() {
+        return personne;
     }
 
-    public void setMatricule(String matricule) {
-        this.matricule = matricule;
+    public void setPersonne(Personne personne) {
+        this.personne = personne;
     }
 
     public String getNotype() {
@@ -61,12 +62,12 @@ public class demande {
         this.notype = notype;
     }
 
-    public String getImmat() {
-        return immat;
+    public Vehicule getVehicule() {
+        return vehicule;
     }
 
-    public void setImmat(String immat) {
-        this.immat = immat;
+    public void setVehicule(Vehicule vehicule) {
+        this.vehicule = vehicule;
     }
 
     public int getDuree() {
@@ -95,11 +96,10 @@ public class demande {
 
     @Override
     public String toString() {
-        return "demande [datereserv=" + datereserv + ", numero=" + numero + ", datedebyt=" + datedebyt + ", matricule="
-                + matricule + ", notype=" + notype + ", immat=" + immat + ", duree=" + duree + ", dateretoureffectif="
+        return "demande [datereserv=" + datereserv + ", numero=" + numero + ", datedebyt=" + datedebyt + ", personne="
+                + personne + ", notype=" + notype + ", vehicule=" + vehicule + ", duree=" + duree
+                + ", dateretoureffectif="
                 + dateretoureffectif + ", etat=" + etat + "]";
     }
-
-    
 
 }

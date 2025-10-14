@@ -1,5 +1,7 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class connection {
@@ -25,6 +27,28 @@ public class connection {
                 conn.close();
             }
         } catch (SQLException e) {
+        }
+    }
+
+    public boolean verifierConnexion(String nom, String prenom, String mdp) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT nom, prenom FROM personne WHERE nom = ? AND prenom = ? AND mdp = ?");
+            stmt.setString(1, nom);
+            stmt.setString(2, prenom);
+            stmt.setString(3, mdp);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                System.out.println("OK - Bonjour " + rs.getString("prenom") + " " + rs.getString("nom"));
+                return true;
+            } else {
+                System.out.println("ERREUR - Mauvais identifiants");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("ERREUR - " + e.getMessage());
+            return false;
         }
     }
 

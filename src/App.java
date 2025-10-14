@@ -4,12 +4,12 @@ public class App {
     public static void main(String[] args) {
         // Initialisation
         Scanner s = new Scanner(System.in);
-        Connection db = new Connection();
-        Passerelle passerelle = new Passerelle();
+        Passerelle db = new Passerelle();
+        menu menu = new menu();
 
-        boolean connecte = passerelle.menuConnexion(s, db);
+        boolean connecte = menu.menuConnexion(s, db);
 
-        
+        menu.afficherMenu();
 
 
 

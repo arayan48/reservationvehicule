@@ -1,117 +1,66 @@
-import java.util.Scanner;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Passerelle {
+    private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
+    private String user = "rayan";
+    private String passwd = "Rayan789";
+    private java.sql.Connection conn;
 
-    public void afficherBienvenue() {
-        System.out.println("===== BIENVENUE SUR LE SYSTEME DE RESERVATION DU CENTRE HOSPITALIER =====");
-    }
-
-    public boolean menuConnexion(Scanner s, Connection db) {
-        afficherBienvenue();
-
-        System.out.println("===== CONNEXION =====");
-
-        boolean connecte = false;
-
-        // Boucle de connexion - redemande tant que l'utilisateur n'est pas connecté
-        while (!connecte) {
-            System.out.print("Entrez votre matricule : ");
-            int matricule = s.nextInt();
-            s.nextLine(); // Consomme le retour à la ligne
-
-            System.out.print("Entrez votre mot de passe : ");
-            String mdp = s.nextLine();
-
-            // Vérifier la connexion
-            connecte = db.verifierConnexion(matricule, mdp);
-
-            if (!connecte) {
-                System.out.println("Veuillez réessayer.\n");
-            }
+    public Passerelle() {
+        try {
+            this.conn = DriverManager.getConnection(url, user, passwd);
+        } catch (Exception e) {
         }
-
-        return connecte;
     }
 
-    public void menuReservation(Scanner s) {
-        // Réservation des Véhicules
-        System.out.println("\n===== RESERVATION =====");
-        System.out.print("Combien de vehicules souhaitez-vous reserver ? ");
-        System.out.println(); // ligne vide pour aérer
-        // Ajout des véhicules
-        // Avec type, heure, priorité etc ....
+    public java.sql.Connection getConnection() {
+        return this.conn;
     }
 
-    public void menuVerificationDisponibilite() {
-        // Vérification de la disponibilité du véhicule
-        System.out.println("\n===== VERIFICATION DE DISPONIBILITE =====");
-        // Fonction de vérif de la base de données
-        // Afin de vérifier si le véhicule est présent et disponible ou bien prit
-
-        // Si le véhicule est dipso
-        System.out.println("Ce vehicule " + " est disponible.");
-
-        System.out.println("\nVotre reservation a ete validee pour les vehicules suivants :");
-        // TO STRING des véhicules les affichant en réservation
-        // Avec le nom, le prénom et les véhicules pour telle heure
-
-        System.out.println("Desole ce vehicule " + " n est pas disponible.");
-        // Autrement
-
-        // Refaire la demande au besoin
-        System.out.println("Aucun vehicule disponible. Merci de reessayer plus tard.");
+    public void closeConnection() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+        }
     }
 
-    public void menuModification(Scanner s) {
-        // Demande de modification de la réservation
-        // Choix de la modification
-        System.out.println("\nSouhaitez-vous modifier votre reservation ? (oui/non)");
+    public boolean verifierConnexion(int matricule, String mdp) {
+        try {
+            PreparedStatement stmt = conn
+                    .prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
+            stmt.setInt(1, matricule);
+            stmt.setString(2, mdp);
 
-        // Si la personne souhaite modifier
-        // activer la fonction de modification des choix
-        // que ça soit au niveau du véhicule
-        // ou de l'heure de réservation
+            ResultSet rs = stmt.executeQuery();
 
-        // Si le choix est fait
-        System.out.println("\n Reservation mise a jour !");
-        // Ou aucun choix
-        System.out.println("Aucune modification effectuee.");
+            if (rs.next()) {
+                System.out.println("OK - Bonjour " + rs.getString("prenom") + " " + rs.getString("nom"));
+                return true;
+            } else {
+                System.out.println("ERREUR - Mauvais identifiants");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("ERREUR - " + e.getMessage());
+            return false;
+        }
     }
 
-    public void menuResumeFinal() {
-        // Message Final
-        System.out.println("\n===== RESUME FINAL =====");
-        System.out.println("Vehicules reserves :");
-        // Affichage du nombre de Véhicules via To STRING
-
-        System.out.println("\nMerci d avoir utilise notre service de reservation !");
-        System.out.println(" Au revoir !");
+    @Override
+    public String toString() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                return "Connexion active : " + url + " | Utilisateur : " + user + " | Statut : CONNECTÉ";
+            } else {
+                return "Connexion inactive : " + url + " | Utilisateur : " + user + " | Statut : FERMÉE";
+            }
+        } catch (SQLException e) {
+            return "Erreur de connexion : " + url + " | Utilisateur : " + user + " | Erreur : " + e.getMessage();
+        }
     }
-
-    // Méthodes existantes conservées
-    public void connect() {
-
-    }
-
-    public void demande() {
-
-    }
-
-    public void validation() {
-
-    }
-
-    public void modification() {
-    System.out.println("\n===== MODIFIER UNE RESERVATION =====");
-        // Affiche toute la table demande
-        //Exemple
-            System.out.println("Que souhaitez vous faire ? Demander : 1 Valider : 2  Annuler : 3");
-        
-        // Appel de la methode en fonction du switch case
-         System.out.println("Votre reservation a été modifiée");
-        // OU
-           System.out.println("Aucune réservation n'as été modifié");
-    }
-
 }
-

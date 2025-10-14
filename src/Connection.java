@@ -1,4 +1,3 @@
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +7,7 @@ public class Connection {
     private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
     private String user = "rayan";
     private String passwd = "Rayan789";
-    private Connection conn;
+    private java.sql.Connection conn;
 
     public Connection() {
         try {
@@ -17,7 +16,7 @@ public class Connection {
         }
     }
 
-    public Connection getConnection() {
+    public java.sql.Connection getConnection() {
         return this.conn;
     }
 
@@ -32,12 +31,13 @@ public class Connection {
 
     public boolean verifierConnexion(int matricule, String mdp) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
+            PreparedStatement stmt = conn
+                    .prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
             stmt.setInt(1, matricule);
             stmt.setString(2, mdp);
 
             ResultSet rs = stmt.executeQuery();
-            
+
             if (rs.next()) {
                 System.out.println("OK - Bonjour " + rs.getString("prenom") + " " + rs.getString("nom"));
                 return true;

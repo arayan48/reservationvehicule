@@ -7,11 +7,9 @@ public class App {
         Connection db = new Connection();
         Passerelle passerelle = new Passerelle();
 
-        // Affichage du message de bienvenue
-        passerelle.afficherBienvenue();
-
-        // Menu de connexion avec boucle
         boolean connecte = passerelle.menuConnexion(s, db);
+
+        
 
 
 

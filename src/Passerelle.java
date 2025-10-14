@@ -7,6 +7,8 @@ public class Passerelle {
     }
 
     public boolean menuConnexion(Scanner s, Connection db) {
+        afficherBienvenue();
+
         System.out.println("===== CONNEXION =====");
 
         boolean connecte = false;

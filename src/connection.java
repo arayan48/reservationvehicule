@@ -4,13 +4,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class connection {
+public class Connection {
     private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
     private String user = "rayan";
     private String passwd = "Rayan789";
     private Connection conn;
 
-    public connection() {
+    public Connection() {
         try {
             this.conn = DriverManager.getConnection(url, user, passwd);
         } catch (Exception e) {

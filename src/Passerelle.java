@@ -100,7 +100,16 @@ public class Passerelle {
     }
 
     public void modification() {
-
+    System.out.println("\n===== MODIFIER UNE RESERVATION =====");
+        // Affiche toute la table demande
+        //Exemple
+            System.out.println("Que souhaitez vous faire ? Demander : 1 Valider : 2  Annuler : 3");
+        
+        // Appel de la methode en fonction du switch case
+         System.out.println("Votre reservation a été modifiée");
+        // OU
+           System.out.println("Aucune réservation n'as été modifié");
     }
 
 }
+

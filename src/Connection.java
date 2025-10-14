@@ -30,13 +30,12 @@ public class Connection {
         }
     }
 
-    public boolean verifierConnexion(String nom, String prenom, String mdp) {
+    public boolean verifierConnexion(int matricule, String mdp) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT nom, prenom FROM personne WHERE nom = ? AND prenom = ? AND mdp = ?");
-            stmt.setString(1, nom);
-            stmt.setString(2, prenom);
-            stmt.setString(3, mdp);
-            
+            PreparedStatement stmt = conn.prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
+            stmt.setInt(1, matricule);
+            stmt.setString(2, mdp);
+
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {

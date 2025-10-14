@@ -9,19 +9,14 @@ public class App {
         
         
         System.out.println("===== CONNEXION =====");
-        // Connexion via Login et Mot de Passe
-        System.out.print("Entrez votre nom : ");
-        String nom = s.nextLine();
-        
-        System.out.print("Entrez votre nom : ");
-        String prenom = s.nextLine();
+        System.out.print("Entrez votre matricule : ");
+        int matricule = s.nextInt();
 
         System.out.print("Entrez votre mot de passe : ");
         String mdp = s.nextLine();
 
         // Vérification simple
-        //Si le nom, le prenom et mdp existent dans la bdd
-        db.verifierConnexion(nom, prenom, mdp);
+        db.verifierConnexion(matricule, mdp);
         System.out.println("Connexion reussie !");
         
         //Autrement le refaire

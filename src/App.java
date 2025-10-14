@@ -22,10 +22,10 @@ public class App {
         // Vérification simple
         //Si le nom, le prenom et mdp existent dans la bdd
         db.verifierConnexion(nom, prenom, mdp);
-        System.out.println("✅ Connexion reussie !");
+        System.out.println("Connexion reussie !");
         
         //Autrement le refaire
-        System.out.println("❌ Identifiants incorrects. refaire la connexion.");
+        System.out.println("Identifiants incorrects. refaire la connexion.");
         
 
         // Réservation des Véhicules
@@ -81,4 +81,5 @@ public class App {
 
     }
 }
+
 

@@ -6,40 +6,46 @@ public class Menu {
         System.out.println("===== BIENVENUE SUR LE SYSTEME DE RESERVATION DU CENTRE HOSPITALIER =====");
     }
 
+    public void afficherMenu(Scanner scanner, Passerelle db) {
+        boolean continuer = true;
 
-    public void afficherMenu() {
-        afficherBienvenue();
-        System.out.println("\n===== MENU PRINCIPAL =====");
-        System.out.println("1. Faire une réservation");
-        System.out.println("2. Vérifier la disponibilité d'un véhicule");
-        System.out.println("3. Modifier une réservation");
-        System.out.println("0. Quitter");
+        while (continuer) {
+            clearConsole();
+            afficherBienvenue();
+            System.out.println("\n===== MENU PRINCIPAL =====");
+            System.out.println("1. Faire une réservation");
+            System.out.println("2. Vérifier la disponibilité d'un véhicule");
+            System.out.println("3. Modifier une réservation");
+            System.out.println("0. Quitter");
 
-        System.out.print("Veuillez choisir une option : ");
+            System.out.print("Veuillez choisir une option : ");
 
-        Scanner scanner = new Scanner(System.in);
-        int choix = scanner.nextInt();
-        scanner.nextLine(); 
+            int choix = scanner.nextInt();
+            scanner.nextLine();
 
-        switch (choix) {
-            case 1:
-                // mettre la redirection 
-                break;
-            case 2:
-                // mettre la redirection
-                break;
-            case 3:
-                // mettre la redirection
-                break;
-            case 0:
-                System.out.println("Au revoir !");
-                break;
-            default:
-                break;
+            switch (choix) {
+                case 1:
+                    menuReservation(scanner);
+                    break;
+                case 2:
+                    menuVerificationDisponibilite(scanner);
+                    break;
+                case 3:
+                    modification(scanner);
+                    break;
+                case 0:
+                    System.out.println("Au revoir !");
+                    continuer = false;
+                    break;
+                default:
+                    System.out.println("Option invalide. Veuillez réessayer.");
+                    break;
+            }
         }
     }
 
     public boolean menuConnexion(Scanner s, Passerelle db) {
+        clearConsole();
         afficherBienvenue();
 
         System.out.println("===== CONNEXION =====");
@@ -49,7 +55,7 @@ public class Menu {
         while (!connecte) {
             System.out.print("Entrez votre matricule : ");
             int matricule = s.nextInt();
-            s.nextLine(); 
+            s.nextLine();
 
             System.out.print("Entrez votre mot de passe : ");
             String mdp = s.nextLine();
@@ -65,15 +71,24 @@ public class Menu {
     }
 
     public void menuReservation(Scanner s) {
+        clearConsole();
         // Réservation des Véhicules
         System.out.println("\n===== RESERVATION =====");
         System.out.print("Combien de vehicules souhaitez-vous reserver ? ");
         System.out.println(); // ligne vide pour aérer
         // Ajout des véhicules
         // Avec type, heure, priorité etc ....
+
+        // Simulation du processus de réservation
+        // ... code de réservation ...
+
+        System.out.println("\nReservation terminee !");
+        System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
+        s.nextLine();
     }
 
-    public void menuVerificationDisponibilite() {
+    public void menuVerificationDisponibilite(Scanner s) {
+        clearConsole();
         // Vérification de la disponibilité du véhicule
         System.out.println("\n===== VERIFICATION DE DISPONIBILITE =====");
         // Fonction de vérif de la base de données
@@ -91,9 +106,14 @@ public class Menu {
 
         // Refaire la demande au besoin
         System.out.println("Aucun vehicule disponible. Merci de reessayer plus tard.");
+
+        System.out.println("\nVerification terminee !");
+        System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
+        s.nextLine();
     }
 
     public void menuModification(Scanner s) {
+        clearConsole();
         // Demande de modification de la réservation
         // Choix de la modification
         System.out.println("\nSouhaitez-vous modifier votre reservation ? (oui/non)");
@@ -107,6 +127,10 @@ public class Menu {
         System.out.println("\n Reservation mise a jour !");
         // Ou aucun choix
         System.out.println("Aucune modification effectuee.");
+
+        System.out.println("\nModification terminee !");
+        System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
+        s.nextLine();
     }
 
     public void menuResumeFinal() {
@@ -119,18 +143,26 @@ public class Menu {
         System.out.println(" Au revoir !");
     }
 
-
-    public void modification() {
-    System.out.println("\n===== MODIFIER UNE RESERVATION =====");
+    public void modification(Scanner s) {
+        clearConsole();
+        System.out.println("\n===== MODIFIER UNE RESERVATION =====");
         // Affiche toute la table demande
-        //Exemple
-            System.out.println("Que souhaitez vous faire ? Demander : 1 Valider : 2  Annuler : 3");
-        
+        // Exemple
+        System.out.println("Que souhaitez vous faire ? Demander : 1 Valider : 2  Annuler : 3");
+
         // Appel de la methode en fonction du switch case
-         System.out.println("Votre reservation a été modifiée");
+        System.out.println("Votre reservation a été modifiée");
         // OU
-           System.out.println("Aucune réservation n'as été modifié");
+        System.out.println("Aucune réservation n'as été modifié");
+
+        System.out.println("\nModification terminee !");
+        System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
+        s.nextLine();
+    }
+
+    public static void clearConsole() {
+        System.out.print("\033[2J\033[H");
+        System.out.flush();
     }
 
 }
-

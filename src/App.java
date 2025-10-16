@@ -5,13 +5,13 @@ public class App {
         // Initialisation
         Scanner s = new Scanner(System.in);
         Passerelle db = new Passerelle();
-        menu menu = new menu();
+        Menu menu = new Menu();
 
         boolean connecte = menu.menuConnexion(s, db);
 
-        menu.afficherMenu();
-
-
+        if (connecte) {
+            menu.afficherMenu(s, db);
+        }
 
         // Fermeture des ressources
         s.close();

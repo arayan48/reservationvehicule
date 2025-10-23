@@ -63,4 +63,32 @@ public class Passerelle {
             return "Erreur de connexion : " + url + " | Utilisateur : " + user + " | Erreur : " + e.getMessage();
         }
     }
+
+    //Fonction de Validation du Véhicule
+    public boolean verifierReservation(String marque, String modele, Type unType, int immat){
+        boolean verif=false;
+        try {
+            PreparedStatement stmt = conn
+                    .prepareStatement("SELECT COUNT(*) FROM vehicule  WHERE marque = ?  AND modele = ? AND noType = ? AND immat = ? EXIST ");
+            stmt.setString(1, marque);
+            stmt.setString(2, modele);
+            stmt.setInt(3, unType.getNumero());
+            stmt.setInt(4, immat);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+           // Vérifie si la première (et seule) ligne de résultat existe ET si le compte est supérieur à 0
+            if (rs.next() && rs.getInt(1) > 0) { 
+                System.out.println("ERREUR - Validation non possible - Véhicule déjà existant - Choisissez un autre véhicule ");
+                verif = true; 
+            } else {
+                System.out.println("OK - Validation de la Réservation");
+                verif = false;
+            }
+            return verif;
+        } catch (Exception e) {
+            System.out.println("ERREUR - " + e.getMessage());
+            return verif;
+        }
+    }
 }

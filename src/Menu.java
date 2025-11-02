@@ -28,7 +28,7 @@ public class Menu {
                     menuReservation(scanner);
                     break;
                 case 2:
-                    menuVerificationDisponibilite(scanner);
+                    menuVerificationDisponibilite(scanner, db);
                     break;
                 case 3:
                     modification(scanner);
@@ -87,25 +87,56 @@ public class Menu {
         s.nextLine();
     }
 
-    public void menuVerificationDisponibilite(Scanner s) {
-        clearConsole();
+     public void menuVerificationDisponibilite(Scanner s, Passerelle db) {
         // Vérification de la disponibilité du véhicule
         System.out.println("\n===== VERIFICATION DE DISPONIBILITE =====");
         // Fonction de vérif de la base de données
-        // Afin de vérifier si le véhicule est présent et disponible ou bien prit
+        // Afin de vérifier si le véhicule est présent et disponible ou bien pris
 
-        // Si le véhicule est dipso
-        System.out.println("Ce vehicule " + " est disponible.");
+        // Demande des informations au utilisateur
+        System.out.print("Entrez la marque du véhicule : ");
+        String marque = s.nextLine();
 
-        System.out.println("\nVotre reservation a ete validee pour les vehicules suivants :");
-        // TO STRING des véhicules les affichant en réservation
-        // Avec le nom, le prénom et les véhicules pour telle heure
+        System.out.print("Entrez le modèle du véhicule : ");
+        String modele = s.nextLine();
 
-        System.out.println("Desole ce vehicule " + " n est pas disponible.");
-        // Autrement
+        System.out.print("Entrez le numéro du type : ");
+        int numType = s.nextInt();
+        s.nextLine(); // consomme le retour à la ligne
 
-        // Refaire la demande au besoin
-        System.out.println("Aucun vehicule disponible. Merci de reessayer plus tard.");
+        System.out.print("Entrez l'immatriculation du véhicule : ");
+        int immat = s.nextInt();
+        s.nextLine();
+
+        // Création de l'objet Type à partir du numéro saisi
+        Type unType = db.recupererTypeParNumero(numType);
+        
+
+        if (unType == null) {
+            System.out.println("\nERREUR : le type de véhicule saisi n'existe pas.");
+            System.out.println("Appuyez sur Entrée pour revenir au menu principal...");
+            s.nextLine();
+            return; // quitte la méthode
+        }
+
+
+        // Appel de la fonction de vérification de réservation
+        boolean existe = db.verifierReservation(marque, modele, unType, immat);
+
+        // Si le véhicule est dispo
+        if (!existe) {
+            System.out.println("Ce vehicule " + modele + " est disponible.");
+
+            System.out.println("\nVotre reservation a ete validee pour les vehicules suivants :");
+            // TO STRING des véhicules les affichant en réservation
+            // Avec le nom, le prénom et les véhicules pour telle heure
+        } else {
+            System.out.println("Desole ce vehicule " + modele + " n est pas disponible.");
+            // Autrement
+
+            // Refaire la demande au besoin
+            System.out.println("Aucun vehicule disponible. Merci de reessayer plus tard.");
+        }
 
         System.out.println("\nVerification terminee !");
         System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
@@ -166,3 +197,4 @@ public class Menu {
     }
 
 }
+

@@ -80,7 +80,39 @@ public class Passerelle {
         }
         return null;
     }
-    
+     public void modifierReservation(int numero, LocalDate datereserv,
+                                    LocalDate dateDebut, String matricule,
+                                    int noType, String immat, int duree,
+                                    LocalDate dateRetourEffectif, String etat) {
+
+        try {
+            PreparedStatement stmt = conn
+                    .prepareStatement("UPDATE demande SET datedebut = ?, matricule = ?, notype = ?, immat = ?, duree = ?, dateretoureffectif = ?, etat = ?
+            WHERE numero = ? AND datereserv = ?");
+            stmt.setDate(1, java.sql.Date.valueOf(dateDebut));
+            stmt.setString(2, matricule);
+            stmt.setInt(3, noType);
+            stmt.setString(4, immat);
+            stmt.setInt(5, duree);
+            if (dateRetourEffectif != null) {
+                stmt.setDate(6, java.sql.Date.valueOf(dateRetourEffectif));
+            } else {
+                stmt.setNull(6, Types.DATE);
+            }
+            stmt.setString(7, etat);
+            stmt.setInt(8, numero);
+            stmt.setDate(9, java.sql.Date.valueOf(datereserv));
+
+            int lignes = stmt.executeUpdate();
+            if (lignes > 0) {
+                System.out.println("✅ Réservation modifiée avec succès !");
+            } else {
+                System.out.println("❌ Aucune réservation trouvée avec ce couple numéro/date.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     //Fonction de Validation du Véhicule
     public boolean verifierReservation(String marque, String modele, Type unType, int immat){
         boolean verif=false;

@@ -64,6 +64,23 @@ public class Passerelle {
         }
     }
 
+    
+    //Fonction crée pour récupérer le numéro du type afin de fludifier la vérification de la réservation
+    //Réutilisable pour afficher le numero du type dans le cas de la réservation ou de la modif si besoin
+    public Type recupererTypeParNumero(int numero) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT noType, libelle FROM type WHERE noType = ?");
+            stmt.setInt(1, numero);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Type(rs.getInt("noType"), rs.getString("libelle"));
+            }
+        } catch (Exception e) {
+            System.out.println("ERREUR récupération Type : " + e.getMessage());
+        }
+        return null;
+    }
+    
     //Fonction de Validation du Véhicule
     public boolean verifierReservation(String marque, String modele, Type unType, int immat){
         boolean verif=false;

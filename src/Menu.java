@@ -143,26 +143,51 @@ public class Menu {
         s.nextLine();
     }
 
-    public void menuModification(Scanner s) {
-        clearConsole();
-        // Demande de modification de la réservation
-        // Choix de la modification
-        System.out.println("\nSouhaitez-vous modifier votre reservation ? (oui/non)");
+    public void menuModification(Scanner s, Passerelle db) {
+    System.out.println("\n===== MODIFIER UNE RESERVATION =====");
+        
+    System.out.print("Numéro de la réservation : ");
+    int numero = s.nextInt();
+    s.nextLine();
 
-        // Si la personne souhaite modifier
-        // activer la fonction de modification des choix
-        // que ça soit au niveau du véhicule
-        // ou de l'heure de réservation
+    System.out.print("Date de la réservation (AAAA-MM-JJ) : ");
+    LocalDate datereserv = LocalDate.parse(s.nextLine());
 
-        // Si le choix est fait
-        System.out.println("\n Reservation mise a jour !");
-        // Ou aucun choix
-        System.out.println("Aucune modification effectuee.");
-
-        System.out.println("\nModification terminee !");
-        System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
-        s.nextLine();
+    if (!db.reservationExiste(numero, datereserv)) {
+        System.out.println("Aucune réservation trouvée avec ce numéro et cette date !");
     }
+        else {
+
+    System.out.println("✅ Réservation trouvée. Saisissez les champs à modifier :");
+    System.out.print("Nouvelle date de début (AAAA-MM-JJ) : ");
+    LocalDate dateDebut = LocalDate.parse(s.nextLine());
+
+    System.out.print("Matricule du personnel : ");
+    String matricule = s.nextLine();
+
+    System.out.print("Numéro du type : ");
+    int noType = s.nextInt();
+    s.nextLine();
+
+    System.out.print("Immatriculation du véhicule : ");
+    String immat = s.nextLine();
+
+    System.out.print("Durée (jours) : ");
+    int duree = s.nextInt();
+    s.nextLine();
+
+    System.out.print("Date retour effectif (AAAA-MM-JJ ou vide) : ");
+    String dateRetourStr = s.nextLine();
+    LocalDate dateRetourEffectif = dateRetourStr.isBlank() ? null : LocalDate.parse(dateRetourStr);
+
+    System.out.print("État de la réservation : ");
+    String etat = s.nextLine();
+
+    // Appel à la passerelle
+    db.modifierReservation(numero, datereserv, dateDebut, matricule, noType, immat, duree, dateRetourEffectif, etat);
+}extLine();
+    }
+}
 
     public void menuResumeFinal() {
         // Message Final
@@ -174,22 +199,6 @@ public class Menu {
         System.out.println(" Au revoir !");
     }
 
-    public void modification(Scanner s) {
-        clearConsole();
-        System.out.println("\n===== MODIFIER UNE RESERVATION =====");
-        // Affiche toute la table demande
-        // Exemple
-        System.out.println("Que souhaitez vous faire ? Demander : 1 Valider : 2  Annuler : 3");
-
-        // Appel de la methode en fonction du switch case
-        System.out.println("Votre reservation a été modifiée");
-        // OU
-        System.out.println("Aucune réservation n'as été modifié");
-
-        System.out.println("\nModification terminee !");
-        System.out.println("\nAppuyez sur Entree pour revenir au menu principal...");
-        s.nextLine();
-    }
 
     public static void clearConsole() {
         System.out.print("\033[2J\033[H");
@@ -197,4 +206,5 @@ public class Menu {
     }
 
 }
+
 

@@ -1,16 +1,16 @@
 public class Vehicule {
-    private int immat;
+    private String immat;
     private String marque;
     private String modele;
     private Type unType;
 
-    public Vehicule(int immat, String marque, String modele) {
+    public Vehicule(String immat, String marque, String modele) {
         this.immat = immat;
         this.marque = marque;
         this.modele = modele;
     }
 
-    public int getImmat() {
+    public String getImmat() {
         return immat;
     }
 
@@ -22,7 +22,7 @@ public class Vehicule {
         return modele;
     }
 
-    public void setImmat(int immat) {
+    public void setImmat(String immat) {
         this.immat = immat;
     }
 
@@ -36,3 +36,4 @@ public class Vehicule {
    
     
 }
+

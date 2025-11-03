@@ -1,5 +1,5 @@
 public class Personne {
-    //Attributs
+    // Attributs
     private String matricule;
     private String  nom;
     private String telephone;
@@ -10,7 +10,8 @@ public class Personne {
         this.nom = nom;
         this.telephone = telephone;
     }
-    
+    // getters et setters
+
     @Override
     public String toString() {
         return "Personne{" + "matricule=" + matricule + ", nom=" + nom + ", telephone=" + telephone + '}';
@@ -42,3 +43,4 @@ public class Personne {
     
     
 }
+

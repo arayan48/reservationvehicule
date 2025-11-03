@@ -114,7 +114,7 @@ public class Passerelle {
         }
     }
     //Fonction de Validation du Véhicule
-    public boolean verifierReservation(String marque, String modele, Type unType, int immat){
+    public boolean verifierReservation(String marque, String modele, Type unType, String immat){
         boolean verif=false;
         try {
             PreparedStatement stmt = conn
@@ -122,7 +122,7 @@ public class Passerelle {
             stmt.setString(1, marque);
             stmt.setString(2, modele);
             stmt.setInt(3, unType.getNumero());
-            stmt.setInt(4, immat);
+            stmt.setString(4, immat);
             
             ResultSet rs = stmt.executeQuery();
             

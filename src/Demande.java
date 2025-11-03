@@ -1,4 +1,5 @@
 public class Demande {
+    // Attributs
     private String datereserv;
     private int numero;
     private String datedebyt;
@@ -21,7 +22,7 @@ public class Demande {
         this.dateretoureffectif = dateretoureffectif;
         this.etat = etat;
     }
-
+// Getters et setters
     public String getDatereserv() {
         return datereserv;
     }

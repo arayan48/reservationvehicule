@@ -1,4 +1,5 @@
 public class Service {
+    // Attributs
     private int numero;
     private String libelle;
 
@@ -6,6 +7,7 @@ public class Service {
         this.numero = numero;
         this.libelle = libelle;
     }
+    // Getters et Setters
 
     public int getNumero() {
         return numero;

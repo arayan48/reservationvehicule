@@ -6,16 +6,27 @@ import java.sql.Types;
 import java.time.LocalDate;
 
 public class Passerelle {
-    private String url = "jdbc:postgresql://192.168.1.245:5432/slam2026_AP_rayanayyoubaymane";
-    private String user = "sbai";
-    private String passwd = "sbaisbai";
+    private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
+    private String user = "rayan";
+    private String passwd = "rayan789";
     private java.sql.Connection conn;
     private int matriculeConnecte = 0;
 
     public Passerelle() {
         try {
             this.conn = DriverManager.getConnection(url, user, passwd);
+            System.out.println("✓ Connexion à la base de données établie avec succès");
         } catch (Exception e) {
+            System.err.println("❌ ERREUR - Impossible de se connecter à la base de données :");
+            System.err.println("   URL : " + url);
+            System.err.println("   Utilisateur : " + user);
+            System.err.println("   Message : " + e.getMessage());
+            System.err.println("\nVérifiez que :");
+            System.err.println("  1. PostgreSQL est démarré");
+            System.err.println("  2. L'adresse IP et le port sont corrects");
+            System.err.println("  3. La base de données existe");
+            System.err.println("  4. L'utilisateur et le mot de passe sont corrects");
+            System.err.println("  5. Les autorisations sont configurées dans pg_hba.conf");
         }
     }
 
@@ -33,6 +44,11 @@ public class Passerelle {
     }
 
     public boolean verifierConnexion(int matricule, String mdp) {
+        if (this.conn == null) {
+            System.out.println("❌ ERREUR - Pas de connexion à la base de données.");
+            return false;
+        }
+
         try {
             PreparedStatement stmt = conn
                     .prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
@@ -43,14 +59,18 @@ public class Passerelle {
 
             if (rs.next()) {
                 this.matriculeConnecte = matricule;
-                System.out.println("OK - Bonjour " + rs.getString("prenom") + " " + rs.getString("nom"));
+                System.out.println("\n✅ Connexion réussie !");
+                System.out.println("Bienvenue " + rs.getString("prenom") + " " + rs.getString("nom") + "\n");
+                rs.close();
+                stmt.close();
                 return true;
             } else {
-                System.out.println("ERREUR - Mauvais identifiants");
+                System.out.println("❌ ERREUR - Identifiants incorrects");
+                stmt.close();
                 return false;
             }
-        } catch (Exception e) {
-            System.out.println("ERREUR - " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("❌ ERREUR SQL - " + e.getMessage());
             return false;
         }
     }
@@ -73,15 +93,22 @@ public class Passerelle {
     // Réutilisable pour afficher le numero du type dans le cas de la réservation ou
     // de la modif si besoin
     public Type recupererTypeParNumero(int numero) {
+        if (this.conn == null) {
+            return null;
+        }
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT noType, libelle FROM type WHERE noType = ?");
             stmt.setInt(1, numero);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Type(rs.getInt("noType"), rs.getString("libelle"));
+                Type type = new Type(rs.getInt("noType"), rs.getString("libelle"));
+                rs.close();
+                stmt.close();
+                return type;
             }
-        } catch (Exception e) {
-            System.out.println("ERREUR récupération Type : " + e.getMessage());
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ ERREUR récupération Type - " + e.getMessage());
         }
         return null;
     }
@@ -204,6 +231,10 @@ public class Passerelle {
      * Affiche tous les types de véhicules disponibles
      */
     public void afficherTypes() {
+        if (this.conn == null) {
+            System.out.println("❌ Pas de connexion à la base de données.");
+            return;
+        }
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT noType, libelle FROM type ORDER BY noType");
             ResultSet rs = stmt.executeQuery();
@@ -211,8 +242,10 @@ public class Passerelle {
             while (rs.next()) {
                 System.out.println("  " + rs.getInt("noType") + " - " + rs.getString("libelle"));
             }
-        } catch (Exception e) {
-            System.out.println("ERREUR - " + e.getMessage());
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ ERREUR - " + e.getMessage());
         }
     }
 

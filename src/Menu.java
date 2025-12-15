@@ -56,13 +56,28 @@ public class Menu {
         afficherBienvenue();
 
         System.out.println("===== CONNEXION =====");
+        System.out.println("(Tapez 'quit' pour quitter)\n");
 
         boolean connecte = false;
+        int tentatives = 0;
+        final int MAX_TENTATIVES = 3;
 
-        while (!connecte) {
+        while (!connecte && tentatives < MAX_TENTATIVES) {
             System.out.print("Entrez votre matricule : ");
-            int matricule = s.nextInt();
-            s.nextLine();
+            String matriculeStr = s.nextLine().trim();
+
+            if (matriculeStr.equalsIgnoreCase("quit")) {
+                return false;
+            }
+
+            int matricule;
+            try {
+                matricule = Integer.parseInt(matriculeStr);
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Le matricule doit être un nombre entier.");
+                tentatives++;
+                continue;
+            }
 
             System.out.print("Entrez votre mot de passe : ");
             String mdp = s.nextLine();
@@ -70,7 +85,13 @@ public class Menu {
             connecte = db.verifierConnexion(matricule, mdp);
 
             if (!connecte) {
-                System.out.println("Veuillez réessayer.\n");
+                tentatives++;
+                if (tentatives < MAX_TENTATIVES) {
+                    System.out.println(
+                            "Veuillez réessayer. (" + (MAX_TENTATIVES - tentatives) + " tentatives restantes)\n");
+                } else {
+                    System.out.println("\n❌ Nombre maximum de tentatives atteint.");
+                }
             }
         }
 

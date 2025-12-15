@@ -2,11 +2,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.time.LocalDate;
 
 public class Passerelle {
-    private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
-    private String user = "rayan";
-    private String passwd = "Rayan789";
+    private String url = "jdbc:postgresql://192.168.1.245:5432/slam2026_AP_rayanayyoubaymane";
+    private String user = "sbai";
+    private String passwd = "sbaisbai";
     private java.sql.Connection conn;
 
     public Passerelle() {
@@ -64,9 +66,10 @@ public class Passerelle {
         }
     }
 
-    
-    //Fonction crée pour récupérer le numéro du type afin de fludifier la vérification de la réservation
-    //Réutilisable pour afficher le numero du type dans le cas de la réservation ou de la modif si besoin
+    // Fonction crée pour récupérer le numéro du type afin de fludifier la
+    // vérification de la réservation
+    // Réutilisable pour afficher le numero du type dans le cas de la réservation ou
+    // de la modif si besoin
     public Type recupererTypeParNumero(int numero) {
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT noType, libelle FROM type WHERE noType = ?");
@@ -80,15 +83,16 @@ public class Passerelle {
         }
         return null;
     }
-     public void modifierReservation(int numero, LocalDate datereserv,
-                                    LocalDate dateDebut, String matricule,
-                                    int noType, String immat, int duree,
-                                    LocalDate dateRetourEffectif, String etat) {
+
+    public void modifierReservation(int numero, LocalDate datereserv,
+            LocalDate dateDebut, String matricule,
+            int noType, String immat, int duree,
+            LocalDate dateRetourEffectif, String etat) {
 
         try {
             PreparedStatement stmt = conn
-                    .prepareStatement("UPDATE demande SET datedebut = ?, matricule = ?, notype = ?, immat = ?, duree = ?, dateretoureffectif = ?, etat = ?
-            WHERE numero = ? AND datereserv = ?");
+                    .prepareStatement(
+                            "UPDATE demande SET datedebut = ?, matricule = ?, notype = ?, immat = ?, duree = ?, dateretoureffectif = ?, etat = ? WHERE numero = ? AND datereserv = ?");
             stmt.setDate(1, java.sql.Date.valueOf(dateDebut));
             stmt.setString(2, matricule);
             stmt.setInt(3, noType);
@@ -113,23 +117,27 @@ public class Passerelle {
             e.printStackTrace();
         }
     }
-    //Fonction de Validation du Véhicule
-    public boolean verifierReservation(String marque, String modele, Type unType, String immat){
-        boolean verif=false;
+
+    // Fonction de Validation du Véhicule
+    public boolean verifierReservation(String marque, String modele, Type unType, String immat) {
+        boolean verif = false;
         try {
             PreparedStatement stmt = conn
-                    .prepareStatement("SELECT COUNT(*) FROM vehicule  WHERE marque = ?  AND modele = ? AND noType = ? AND immat = ? EXIST ");
+                    .prepareStatement(
+                            "SELECT COUNT(*) FROM vehicule  WHERE marque = ?  AND modele = ? AND noType = ? AND immat = ? EXIST ");
             stmt.setString(1, marque);
             stmt.setString(2, modele);
             stmt.setInt(3, unType.getNumero());
             stmt.setString(4, immat);
-            
+
             ResultSet rs = stmt.executeQuery();
-            
-           // Vérifie si la première (et seule) ligne de résultat existe ET si le compte est supérieur à 0
-            if (rs.next() && rs.getInt(1) > 0) { 
-                System.out.println("ERREUR - Validation non possible - Véhicule déjà existant - Choisissez un autre véhicule ");
-                verif = true; 
+
+            // Vérifie si la première (et seule) ligne de résultat existe ET si le compte
+            // est supérieur à 0
+            if (rs.next() && rs.getInt(1) > 0) {
+                System.out.println(
+                        "ERREUR - Validation non possible - Véhicule déjà existant - Choisissez un autre véhicule ");
+                verif = true;
             } else {
                 System.out.println("OK - Validation de la Réservation");
                 verif = false;
@@ -138,6 +146,24 @@ public class Passerelle {
         } catch (Exception e) {
             System.out.println("ERREUR - " + e.getMessage());
             return verif;
+        }
+    }
+
+    public boolean reservationExiste(int numero, LocalDate datereserv) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM demande WHERE nodemande = ? AND datereserv = ?");
+            stmt.setInt(1, numero);
+            stmt.setObject(2, datereserv);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+            return false;
+        } catch (Exception e) {
+            System.out.println("ERREUR - " + e.getMessage());
+            return false;
         }
     }
 }

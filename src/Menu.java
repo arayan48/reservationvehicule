@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.time.LocalDate;
 
 public class Menu {
 
@@ -31,7 +32,7 @@ public class Menu {
                     menuVerificationDisponibilite(scanner, db);
                     break;
                 case 3:
-                    modification(scanner);
+                    menuModification(scanner, db);
                     break;
                 case 0:
                     System.out.println("Au revoir !");
@@ -87,7 +88,7 @@ public class Menu {
         s.nextLine();
     }
 
-     public void menuVerificationDisponibilite(Scanner s, Passerelle db) {
+    public void menuVerificationDisponibilite(Scanner s, Passerelle db) {
         // Vérification de la disponibilité du véhicule
         System.out.println("\n===== VERIFICATION DE DISPONIBILITE =====");
         // Fonction de vérif de la base de données
@@ -105,12 +106,10 @@ public class Menu {
         s.nextLine(); // consomme le retour à la ligne
 
         System.out.print("Entrez l'immatriculation du véhicule : ");
-        int immat = s.nextInt();
-        s.nextLine();
+        String immat = s.nextLine();
 
         // Création de l'objet Type à partir du numéro saisi
         Type unType = db.recupererTypeParNumero(numType);
-        
 
         if (unType == null) {
             System.out.println("\nERREUR : le type de véhicule saisi n'existe pas.");
@@ -118,7 +117,6 @@ public class Menu {
             s.nextLine();
             return; // quitte la méthode
         }
-
 
         // Appel de la fonction de vérification de réservation
         boolean existe = db.verifierReservation(marque, modele, unType, immat);
@@ -144,50 +142,49 @@ public class Menu {
     }
 
     public void menuModification(Scanner s, Passerelle db) {
-    System.out.println("\n===== MODIFIER UNE RESERVATION =====");
-        
-    System.out.print("Numéro de la réservation : ");
-    int numero = s.nextInt();
-    s.nextLine();
+        System.out.println("\n===== MODIFIER UNE RESERVATION =====");
 
-    System.out.print("Date de la réservation (AAAA-MM-JJ) : ");
-    LocalDate datereserv = LocalDate.parse(s.nextLine());
+        System.out.print("Numéro de la réservation : ");
+        int numero = s.nextInt();
+        s.nextLine();
 
-    if (!db.reservationExiste(numero, datereserv)) {
-        System.out.println("Aucune réservation trouvée avec ce numéro et cette date !");
+        System.out.print("Date de la réservation (AAAA-MM-JJ) : ");
+        LocalDate datereserv = LocalDate.parse(s.nextLine());
+
+        if (!db.reservationExiste(numero, datereserv)) {
+            System.out.println("Aucune réservation trouvée avec ce numéro et cette date !");
+        } else {
+
+            System.out.println("✅ Réservation trouvée. Saisissez les champs à modifier :");
+            System.out.print("Nouvelle date de début (AAAA-MM-JJ) : ");
+            LocalDate dateDebut = LocalDate.parse(s.nextLine());
+
+            System.out.print("Matricule du personnel : ");
+            String matricule = s.nextLine();
+
+            System.out.print("Numéro du type : ");
+            int noType = s.nextInt();
+            s.nextLine();
+
+            System.out.print("Immatriculation du véhicule : ");
+            String immat = s.nextLine();
+
+            System.out.print("Durée (jours) : ");
+            int duree = s.nextInt();
+            s.nextLine();
+
+            System.out.print("Date retour effectif (AAAA-MM-JJ ou vide) : ");
+            String dateRetourStr = s.nextLine();
+            LocalDate dateRetourEffectif = dateRetourStr.isBlank() ? null : LocalDate.parse(dateRetourStr);
+
+            System.out.print("État de la réservation : ");
+            String etat = s.nextLine();
+
+            // Appel à la passerelle
+            db.modifierReservation(numero, datereserv, dateDebut, matricule, noType, immat, duree, dateRetourEffectif,
+                    etat);
+        }
     }
-        else {
-
-    System.out.println("✅ Réservation trouvée. Saisissez les champs à modifier :");
-    System.out.print("Nouvelle date de début (AAAA-MM-JJ) : ");
-    LocalDate dateDebut = LocalDate.parse(s.nextLine());
-
-    System.out.print("Matricule du personnel : ");
-    String matricule = s.nextLine();
-
-    System.out.print("Numéro du type : ");
-    int noType = s.nextInt();
-    s.nextLine();
-
-    System.out.print("Immatriculation du véhicule : ");
-    String immat = s.nextLine();
-
-    System.out.print("Durée (jours) : ");
-    int duree = s.nextInt();
-    s.nextLine();
-
-    System.out.print("Date retour effectif (AAAA-MM-JJ ou vide) : ");
-    String dateRetourStr = s.nextLine();
-    LocalDate dateRetourEffectif = dateRetourStr.isBlank() ? null : LocalDate.parse(dateRetourStr);
-
-    System.out.print("État de la réservation : ");
-    String etat = s.nextLine();
-
-    // Appel à la passerelle
-    db.modifierReservation(numero, datereserv, dateDebut, matricule, noType, immat, duree, dateRetourEffectif, etat);
-}extLine();
-    }
-}
 
     public void menuResumeFinal() {
         // Message Final
@@ -199,12 +196,9 @@ public class Menu {
         System.out.println(" Au revoir !");
     }
 
-
     public static void clearConsole() {
         System.out.print("\033[2J\033[H");
         System.out.flush();
     }
 
 }
-
-

@@ -1,0 +1,8 @@
+# Ignore all files with .md extension
+*.md
+
+# Ignore all fil sh
+*.sh
+
+# Ignore all jar files
+*.jar

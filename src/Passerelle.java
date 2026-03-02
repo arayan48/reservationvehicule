@@ -6,11 +6,12 @@ import java.sql.Types;
 import java.time.LocalDate;
 
 public class Passerelle {
-    private String url = "jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule";
-    private String user = "rayan";
-    private String passwd = "rayan789";
+    private String url = "jdbc:postgresql://192.168.1.24:5432/ReservationVehicule_SIO2";
+    private String user = "Rayan";
+    private String passwd = "Rayan789";
     private java.sql.Connection conn;
     private int matriculeConnecte = 0;
+    private String roleConnecte = null;
 
     public Passerelle() {
         try {
@@ -51,7 +52,7 @@ public class Passerelle {
 
         try {
             PreparedStatement stmt = conn
-                    .prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
+                    .prepareStatement("SELECT nom, prenom, role FROM personne WHERE matricule = ?  AND mdp = ?");
             stmt.setInt(1, matricule);
             stmt.setString(2, mdp);
 
@@ -59,6 +60,7 @@ public class Passerelle {
 
             if (rs.next()) {
                 this.matriculeConnecte = matricule;
+                this.roleConnecte = rs.getString("role");
                 System.out.println("\n✅ Connexion réussie !");
                 System.out.println("Bienvenue " + rs.getString("prenom") + " " + rs.getString("nom") + "\n");
                 rs.close();
@@ -225,6 +227,10 @@ public class Passerelle {
 
     public int getMatriculeConnecte() {
         return this.matriculeConnecte;
+    }
+
+    public String getRoleConnecte() {
+        return this.roleConnecte;
     }
 
     /**

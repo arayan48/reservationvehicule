@@ -70,18 +70,18 @@ public class App {
         System.out.println("║           PARAMÈTRES DE CONNEXION ACTUELS                      ║");
         System.out.println("╚════════════════════════════════════════════════════════════════╝");
         System.out.println("\n📋 Configuration dans src/Passerelle.java :");
-        System.out.println("   URL      : jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule");
-        System.out.println("   Serveur  : 192.168.1.46");
+        System.out.println("   URL      : jdbc:postgresql://192.168.1.24:5432/slam_reservation_vehicule");
+        System.out.println("   Serveur  : 192.168.1.24");
         System.out.println("   Port     : 5432");
         System.out.println("   Base     : slam_reservation_vehicule");
-        System.out.println("   User     : rayan");
-        System.out.println("   Password : rayan789");
+        System.out.println("   User     : Rayan");
+        System.out.println("   Password : Rayan789");
         System.out.println("\n💡 Pour modifier :");
         System.out.println("   1. Éditez le fichier : src/Passerelle.java");
         System.out.println("   2. Modifiez les valeurs url, user, passwd");
         System.out.println("   3. Recompilez : bash compile.sh");
         System.out.println("   4. Relancez : bash run.sh");
         System.out.println("\n🧪 Pour tester la connexion PostgreSQL :");
-        System.out.println("   psql -h 192.168.1.46 -p 5432 -U rayan -d slam_reservation_vehicule");
+        System.out.println("   psql -h 192.168.1.24 -p 5432 -U Rayan -d slam_reservation_vehicule");
     }
 }

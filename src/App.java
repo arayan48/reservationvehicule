@@ -9,15 +9,44 @@ public class App {
 
         // Initialisation
         Scanner s = new Scanner(System.in);
-        Passerelle db = new Passerelle();
+        Passerelle db = null;
+        boolean connexionReussie = false;
 
-        // Vérifier que la connexion BD est établie
-        if (db.getConnection() == null) {
-            System.err.println("\n❌ ARRÊT DE L'APPLICATION");
-            System.err.println("Impossible de démarrer sans connexion à la base de données.");
-            System.err.println("\nMerci de corriger le problème et relancer l'application.");
-            s.close();
-            return;
+        // Boucle de tentative de connexion
+        while (!connexionReussie) {
+            db = new Passerelle();
+
+            // Vérifier que la connexion BD est établie
+            if (db.getConnection() == null) {
+                System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+                System.out.println("║              PROBLÈME DE CONNEXION À LA BASE                   ║");
+                System.out.println("╚════════════════════════════════════════════════════════════════╝");
+                System.out.println("\nQue voulez-vous faire ?");
+                System.out.println("  1. Réessayer la connexion");
+                System.out.println("  2. Afficher les paramètres de connexion");
+                System.out.println("  3. Quitter l'application");
+                System.out.print("\nVotre choix : ");
+
+                String choix = s.nextLine().trim();
+
+                switch (choix) {
+                    case "1":
+                        System.out.println("\n🔄 Nouvelle tentative de connexion...\n");
+                        continue;
+                    case "2":
+                        afficherParametresConnexion();
+                        System.out.println("\nAppuyez sur Entrée pour continuer...");
+                        s.nextLine();
+                        continue;
+                    case "3":
+                    default:
+                        System.out.println("\n👋 Au revoir !");
+                        s.close();
+                        return;
+                }
+            } else {
+                connexionReussie = true;
+            }
         }
 
         Menu menu = new Menu();
@@ -34,5 +63,25 @@ public class App {
         System.out.println("\n👋 Merci d'avoir utilisé notre système. À bientôt !");
         s.close();
         db.closeConnection();
+    }
+
+    private static void afficherParametresConnexion() {
+        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║           PARAMÈTRES DE CONNEXION ACTUELS                      ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        System.out.println("\n📋 Configuration dans src/Passerelle.java :");
+        System.out.println("   URL      : jdbc:postgresql://192.168.1.46:5432/slam_reservation_vehicule");
+        System.out.println("   Serveur  : 192.168.1.46");
+        System.out.println("   Port     : 5432");
+        System.out.println("   Base     : slam_reservation_vehicule");
+        System.out.println("   User     : rayan");
+        System.out.println("   Password : rayan789");
+        System.out.println("\n💡 Pour modifier :");
+        System.out.println("   1. Éditez le fichier : src/Passerelle.java");
+        System.out.println("   2. Modifiez les valeurs url, user, passwd");
+        System.out.println("   3. Recompilez : bash compile.sh");
+        System.out.println("   4. Relancez : bash run.sh");
+        System.out.println("\n🧪 Pour tester la connexion PostgreSQL :");
+        System.out.println("   psql -h 192.168.1.46 -p 5432 -U rayan -d slam_reservation_vehicule");
     }
 }

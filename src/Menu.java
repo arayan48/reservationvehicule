@@ -10,7 +10,7 @@ public class Menu {
     public void afficherMenu(Scanner scanner, Passerelle db) {
         boolean continuer = true;
         String role = db.getRoleConnecte();
-        boolean isAdmin = "role_admin".equals(role);
+        boolean isAdmin = "ROLE_ADMIN".equals(role);
 
         while (continuer) {
             clearConsole();
@@ -54,12 +54,14 @@ public class Menu {
                     menuModification(scanner, db);
                     break;
                 case 4:
+                    clearConsole();
                     db.afficherMesReservations("" + db.getMatriculeConnecte());
                     System.out.println("\nAppuyez sur Entrée pour continuer...");
                     scanner.nextLine();
                     break;
                 case 5:
                     if (isAdmin) {
+                        clearConsole();
                         db.afficherToutesLesReservations();
                         System.out.println("\nAppuyez sur Entrée pour continuer...");
                         scanner.nextLine();
@@ -115,9 +117,15 @@ public class Menu {
                 tentatives++;
                 if (tentatives < MAX_TENTATIVES) {
                     System.out.println(
-                            "Veuillez réessayer. (" + (MAX_TENTATIVES - tentatives) + " tentatives restantes)\n");
+                            "Veuillez réessayer. (" + (MAX_TENTATIVES - tentatives) + " tentatives restantes)");
+                    System.out.println("\nAppuyez sur Entree pour continuer...");
+                    s.nextLine();
+                    clearConsole();
+                    afficherBienvenue();
+                    System.out.println("===== CONNEXION =====");
+                    System.out.println("(Tapez 'quit' pour quitter)\n");
                 } else {
-                    System.out.println("\n❌ Nombre maximum de tentatives atteint.");
+                    System.out.println("\nNombre maximum de tentatives atteint.");
                 }
             }
         }
@@ -200,10 +208,8 @@ public class Menu {
     }
 
     public void menuVerificationDisponibilite(Scanner s, Passerelle db) {
-        // Vérification de la disponibilité du véhicule
-        System.out.println("\n===== VERIFICATION DE DISPONIBILITE =====");
-        // Fonction de vérif de la base de données
-        // Afin de vérifier si le véhicule est présent et disponible ou bien pris
+        clearConsole();
+        System.out.println("===== VERIFICATION DE DISPONIBILITE =====\n");
 
         // Demande des informations au utilisateur
         System.out.print("Entrez la marque du véhicule : ");

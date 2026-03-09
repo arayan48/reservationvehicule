@@ -9,3 +9,6 @@
 
 # Ignore all pdf files
 *.pdf
+
+# ignore all sql files
+*.sql

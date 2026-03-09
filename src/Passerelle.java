@@ -81,16 +81,10 @@ public class Passerelle {
 
                 String role = rs.getString("role");
 
-                if (role == null
-                        || (!role.equalsIgnoreCase("role_user")
-                                && !role.equalsIgnoreCase("role_admin"))) {
-                    System.out.println("Acces refuse - aucun role valide attribue a ce compte.");
-                    System.out.println("Contactez un administrateur.");
-                    return false;
-                }
-
                 this.matriculeConnecte = matricule;
-                this.roleConnecte      = role.toUpperCase();
+                this.roleConnecte = (role != null && role.equalsIgnoreCase("role_admin"))
+                        ? "ROLE_ADMIN"
+                        : "ROLE_USER";
 
                 System.out.println("\nConnexion reussie !");
                 System.out.println("Bienvenue " + rs.getString("prenom") + " " + rs.getString("nom"));

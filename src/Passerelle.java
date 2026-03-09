@@ -1,3 +1,4 @@
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -6,80 +7,123 @@ import java.sql.Types;
 import java.time.LocalDate;
 
 public class Passerelle {
-    private String url = "jdbc:postgresql://192.168.1.245:5432/slam2026_AP_rayanayyoubaymane";
-    private String user = "sbai";
-    private String passwd = "sbaisbai";
-    private java.sql.Connection conn;
+
+    // ── Paramètres de connexion ─────────────────────────────────────────────
+    private static final String URL    = "jdbc:postgresql://192.168.1.24:5432/ReservationVehicule_SIO2";
+    private static final String USER   = "Rayan";
+    private static final String PASSWD = "Rayan789";
+
+    // ── État interne ────────────────────────────────────────────────────────
+    private Connection conn = null;
+    private int    matriculeConnecte = 0;
+    private String roleConnecte      = null;
+
+    // ── Connexion à la base de données ──────────────────────────────────────
 
     public Passerelle() {
         try {
-            this.conn = DriverManager.getConnection(url, user, passwd);
-        } catch (Exception e) {
+            this.conn = DriverManager.getConnection(URL, USER, PASSWD);
+            System.out.println("Connexion a la base de donnees etablie avec succes.");
+        } catch (SQLException e) {
+            System.err.println("ERREUR - Impossible de se connecter a la base de donnees.");
+            System.err.println("  URL     : " + URL);
+            System.err.println("  Message : " + e.getMessage());
         }
     }
 
-    public java.sql.Connection getConnection() {
+    public boolean isConnected() {
+        try {
+            return conn != null && !conn.isClosed();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public Connection getConnection() {
         return this.conn;
     }
 
     public void closeConnection() {
         try {
-            if (conn != null && !conn.isClosed()) {
+            if (isConnected()) {
                 conn.close();
+                System.out.println("Connexion a la base de donnees fermee.");
             }
         } catch (SQLException e) {
+            System.err.println("ERREUR lors de la fermeture : " + e.getMessage());
         }
     }
 
+    // ── Authentification ────────────────────────────────────────────────────
+
+    /**
+     * Vérifie les identifiants de l'utilisateur.
+     * Stocke le matricule et le rôle en majuscules si la connexion réussit.
+     * @return true si l'authentification est réussie
+     */
     public boolean verifierConnexion(int matricule, String mdp) {
-        try {
-            PreparedStatement stmt = conn
-                    .prepareStatement("SELECT nom, prenom FROM personne WHERE matricule = ?  AND mdp = ?");
+        if (!isConnected()) {
+            System.out.println("ERREUR - Pas de connexion a la base de donnees.");
+            return false;
+        }
+
+        String sql = "SELECT nom, prenom, role FROM personne WHERE matricule = ? AND mdp = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, matricule);
             stmt.setString(2, mdp);
 
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    System.out.println("Identifiants incorrects.");
+                    return false;
+                }
 
-            if (rs.next()) {
-                System.out.println("OK - Bonjour " + rs.getString("prenom") + " " + rs.getString("nom"));
+                String role = rs.getString("role");
+
+                this.matriculeConnecte = matricule;
+                this.roleConnecte = (role != null && role.equalsIgnoreCase("role_admin"))
+                        ? "Admin"
+                        : "User";
+
+                System.out.println("\nConnexion reussie !");
+                System.out.println("Bienvenue " + rs.getString("prenom") + " " + rs.getString("nom"));
+                System.out.println("Role : " + this.roleConnecte);
                 return true;
-            } else {
-                System.out.println("ERREUR - Mauvais identifiants");
-                return false;
             }
-        } catch (Exception e) {
-            System.out.println("ERREUR - " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("ERREUR SQL - " + e.getMessage());
             return false;
         }
     }
 
+    // ── Accesseurs ──────────────────────────────────────────────────────────
+
+    public int    getMatriculeConnecte() { return this.matriculeConnecte; }
+    public String getRoleConnecte()      { return this.roleConnecte; }
+
     @Override
     public String toString() {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                return "Connexion active : " + url + " | Utilisateur : " + user + " | Statut : CONNECTÉ";
-            } else {
-                return "Connexion inactive : " + url + " | Utilisateur : " + user + " | Statut : FERMÉE";
-            }
-        } catch (SQLException e) {
-            return "Erreur de connexion : " + url + " | Utilisateur : " + user + " | Erreur : " + e.getMessage();
-        }
+        return isConnected()
+                ? "Connexion active  : " + URL + " | Utilisateur : " + USER
+                : "Connexion inactive : " + URL + " | Utilisateur : " + USER;
     }
 
-    // Fonction crée pour récupérer le numéro du type afin de fludifier la
-    // vérification de la réservation
-    // Réutilisable pour afficher le numero du type dans le cas de la réservation ou
-    // de la modif si besoin
+    // ── Requêtes metier ─────────────────────────────────────────────────────
+
     public Type recupererTypeParNumero(int numero) {
-        try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT noType, libelle FROM type WHERE noType = ?");
+        if (!isConnected()) return null;
+
+        String sql = "SELECT noType, libelle FROM type WHERE noType = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, numero);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Type(rs.getInt("noType"), rs.getString("libelle"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Type(rs.getInt("noType"), rs.getString("libelle"));
+                }
             }
-        } catch (Exception e) {
-            System.out.println("ERREUR récupération Type : " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("ERREUR recuperation Type - " + e.getMessage());
         }
         return null;
     }
@@ -89,10 +133,11 @@ public class Passerelle {
             int noType, String immat, int duree,
             LocalDate dateRetourEffectif, String etat) {
 
-        try {
-            PreparedStatement stmt = conn
-                    .prepareStatement(
-                            "UPDATE demande SET datedebut = ?, matricule = ?, notype = ?, immat = ?, duree = ?, dateretoureffectif = ?, etat = ? WHERE numero = ? AND datereserv = ?");
+        String sql = "UPDATE demande SET datedebut = ?, matricule = ?, notype = ?, immat = ?, "
+                   + "duree = ?, dateretoureffectif = ?, etat = ? "
+                   + "WHERE numero = ? AND datereserv = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, java.sql.Date.valueOf(dateDebut));
             stmt.setString(2, matricule);
             stmt.setInt(3, noType);
@@ -109,61 +154,197 @@ public class Passerelle {
 
             int lignes = stmt.executeUpdate();
             if (lignes > 0) {
-                System.out.println("✅ Réservation modifiée avec succès !");
+                System.out.println("Reservation modifiee avec succes !");
             } else {
-                System.out.println("❌ Aucune réservation trouvée avec ce couple numéro/date.");
+                System.out.println("Aucune reservation trouvee avec ce couple numero/date.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("ERREUR SQL lors de la modification - " + e.getMessage());
         }
     }
 
-    // Fonction de Validation du Véhicule
     public boolean verifierReservation(String marque, String modele, Type unType, String immat) {
-        boolean verif = false;
-        try {
-            PreparedStatement stmt = conn
-                    .prepareStatement(
-                            "SELECT COUNT(*) FROM vehicule  WHERE marque = ?  AND modele = ? AND noType = ? AND immat = ? EXIST ");
+        String sql = "SELECT COUNT(*) FROM vehicule "
+                   + "WHERE marque = ? AND modele = ? AND noType = ? AND immat = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, marque);
             stmt.setString(2, modele);
             stmt.setInt(3, unType.getNumero());
             stmt.setString(4, immat);
 
-            ResultSet rs = stmt.executeQuery();
-
-            // Vérifie si la première (et seule) ligne de résultat existe ET si le compte
-            // est supérieur à 0
-            if (rs.next() && rs.getInt(1) > 0) {
-                System.out.println(
-                        "ERREUR - Validation non possible - Véhicule déjà existant - Choisissez un autre véhicule ");
-                verif = true;
-            } else {
-                System.out.println("OK - Validation de la Réservation");
-                verif = false;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    System.out.println("Vehicule deja existant - choisissez un autre vehicule.");
+                    return true;
+                }
             }
-            return verif;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());
-            return verif;
         }
+        return false;
     }
 
     public boolean reservationExiste(int numero, LocalDate datereserv) {
-        try {
-            PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT COUNT(*) FROM demande WHERE nodemande = ? AND datereserv = ?");
+        String sql = "SELECT COUNT(*) FROM demande WHERE nodemande = ? AND datereserv = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, numero);
             stmt.setObject(2, datereserv);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
             }
-            return false;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean insererDemande(String datereserv, String datedebut, String matricule,
+            String notype, String immat, int duree, String etat) {
+        String sql = "INSERT INTO demande (datereserv, datedebut, matricule, notype, immat, duree, etat) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, java.sql.Date.valueOf(datereserv));
+            stmt.setDate(2, java.sql.Date.valueOf(datedebut));
+            stmt.setString(3, matricule);
+            stmt.setString(4, notype);
+            stmt.setString(5, immat);
+            stmt.setInt(6, duree);
+            stmt.setString(7, etat);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("ERREUR lors de l'insertion de la demande - " + e.getMessage());
             return false;
+        }
+    }
+
+    public void afficherToutesLesReservations() {
+        String sql = "SELECT d.numero, d.datereserv, d.datedebut, d.duree, d.etat, "
+                   + "p.nom, p.prenom, v.marque, v.modele, v.immat "
+                   + "FROM demande d "
+                   + "JOIN personne p ON d.matricule = p.matricule "
+                   + "JOIN vehicule v ON d.immat = v.immat "
+                   + "ORDER BY d.datedebut DESC";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            System.out.println("\n=== TOUTES LES RESERVATIONS [ADMIN] ===");
+            boolean trouve = false;
+            while (rs.next()) {
+                trouve = true;
+                System.out.println("\nReservation N°" + rs.getInt("numero"));
+                System.out.println("  Employe          : " + rs.getString("prenom") + " " + rs.getString("nom"));
+                System.out.println("  Date reservation : " + rs.getDate("datereserv"));
+                System.out.println("  Date debut       : " + rs.getDate("datedebut"));
+                System.out.println("  Duree            : " + rs.getInt("duree") + " jour(s)");
+                System.out.println("  Vehicule         : " + rs.getString("marque") + " "
+                        + rs.getString("modele") + " (" + rs.getString("immat") + ")");
+                System.out.println("  Etat             : " + rs.getString("etat"));
+            }
+            if (!trouve) System.out.println("Aucune reservation dans le systeme.");
+
+        } catch (SQLException e) {
+            System.out.println("ERREUR - " + e.getMessage());
+        }
+    }
+
+    public void afficherTypes() {
+        if (!isConnected()) {
+            System.out.println("Pas de connexion a la base de donnees.");
+            return;
+        }
+        String sql = "SELECT noType, libelle FROM type ORDER BY noType";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                System.out.println("  " + rs.getInt("noType") + " - " + rs.getString("libelle"));
+            }
+        } catch (SQLException e) {
+            System.out.println("ERREUR - " + e.getMessage());
+        }
+    }
+
+    public void afficherVehiculesParType(String noType) {
+        String sql = "SELECT immat, marque, modele FROM vehicule WHERE notype = ? ORDER BY marque, modele";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, noType);
+            try (ResultSet rs = stmt.executeQuery()) {
+                boolean trouve = false;
+                while (rs.next()) {
+                    trouve = true;
+                    System.out.println("  " + rs.getString("immat") + " - "
+                            + rs.getString("marque") + " " + rs.getString("modele"));
+                }
+                if (!trouve) System.out.println("  Aucun vehicule de ce type.");
+            }
+        } catch (SQLException e) {
+            System.out.println("ERREUR - " + e.getMessage());
+        }
+    }
+
+    public Personne recupererPersonneParMatricule(String matricule) {
+        String sql = "SELECT matricule, nom, telephone FROM personne WHERE matricule = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, matricule);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Personne(
+                            rs.getString("matricule"),
+                            rs.getString("nom"),
+                            rs.getString("telephone"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("ERREUR recuperation Personne - " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Vehicule recupererVehiculeParImmat(String immat) {
+        String sql = "SELECT immat, marque, modele FROM vehicule WHERE immat = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, immat);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Vehicule(
+                            rs.getString("immat"),
+                            rs.getString("marque"),
+                            rs.getString("modele"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("ERREUR recuperation Vehicule - " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void afficherMesReservations(String matricule) {
+        String sql = "SELECT d.numero, d.datereserv, d.datedebut, d.duree, d.etat, "
+                   + "v.marque, v.modele, v.immat "
+                   + "FROM demande d "
+                   + "JOIN vehicule v ON d.immat = v.immat "
+                   + "WHERE d.matricule = ? "
+                   + "ORDER BY d.datedebut DESC";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, matricule);
+            try (ResultSet rs = stmt.executeQuery()) {
+                System.out.println("\n=== VOS RESERVATIONS ===");
+                boolean trouve = false;
+                while (rs.next()) {
+                    trouve = true;
+                    System.out.println("\nReservation N°" + rs.getInt("numero"));
+                    System.out.println("  Date reservation : " + rs.getDate("datereserv"));
+                    System.out.println("  Date debut       : " + rs.getDate("datedebut"));
+                    System.out.println("  Duree            : " + rs.getInt("duree") + " jour(s)");
+                    System.out.println("  Vehicule         : " + rs.getString("marque") + " "
+                            + rs.getString("modele") + " (" + rs.getString("immat") + ")");
+                    System.out.println("  Etat             : " + rs.getString("etat"));
+                }
+                if (!trouve) System.out.println("Aucune reservation trouvee.");
+            }
+        } catch (SQLException e) {
+            System.out.println("ERREUR - " + e.getMessage());
         }
     }
 }

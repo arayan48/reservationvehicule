@@ -22,7 +22,8 @@ public class Demande {
         this.dateretoureffectif = dateretoureffectif;
         this.etat = etat;
     }
-// Getters et setters
+
+    // Getters et setters
     public String getDatereserv() {
         return datereserv;
     }
@@ -101,6 +102,44 @@ public class Demande {
                 + personne + ", notype=" + notype + ", vehicule=" + vehicule + ", duree=" + duree
                 + ", dateretoureffectif="
                 + dateretoureffectif + ", etat=" + etat + "]";
+    }
+
+    /**
+     * Méthode pour créer une nouvelle demande de réservation
+     * 
+     * @param db Passerelle vers la base de données
+     * @return true si la demande a été créée avec succès, false sinon
+     */
+    public boolean faireDemande(Passerelle db) {
+        try {
+            // Vérifier que les données essentielles sont présentes
+            if (this.datereserv == null || this.datedebyt == null ||
+                    this.personne == null || this.vehicule == null) {
+                System.out.println("ERREUR - Données manquantes pour créer la demande");
+                return false;
+            }
+
+            // Insérer la demande dans la base de données
+            boolean resultat = db.insererDemande(
+                    this.datereserv,
+                    this.datedebyt,
+                    this.personne.getMatricule(),
+                    this.notype,
+                    this.vehicule.getImmat(),
+                    this.duree,
+                    this.etat != null ? this.etat : "En attente");
+
+            if (resultat) {
+                System.out.println("✓ Demande de réservation créée avec succès");
+                return true;
+            } else {
+                System.out.println("✗ Échec de la création de la demande");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("ERREUR - " + e.getMessage());
+            return false;
+        }
     }
 
 }

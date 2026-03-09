@@ -1,0 +1,14 @@
+# Ignore all files with .md extension
+*.md
+
+# Ignore all fil sh
+*.sh
+
+# Ignore all jar files
+*.jar
+
+# Ignore all pdf files
+*.pdf
+
+# ignore all sql files
+*.sql

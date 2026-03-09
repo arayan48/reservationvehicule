@@ -6,3 +6,6 @@
 
 # Ignore all jar files
 *.jar
+
+# Ignore all pdf files
+*.pdf

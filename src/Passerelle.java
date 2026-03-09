@@ -59,10 +59,20 @@ public class Passerelle {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
+                String role = rs.getString("role");
+                System.out.println("[DEBUG] role récupéré = '" + role + "'");
+                if (role == null || (!role.equalsIgnoreCase("role_user") && !role.equalsIgnoreCase("role_admin"))) {
+                    System.out.println("\n❌ Accès refusé - aucun rôle valide attribué à ce compte.");
+                    System.out.println("   Contactez un administrateur.");
+                    rs.close();
+                    stmt.close();
+                    return false;
+                }
                 this.matriculeConnecte = matricule;
-                this.roleConnecte = rs.getString("role");
+                this.roleConnecte = role.toUpperCase();
                 System.out.println("\n✅ Connexion réussie !");
-                System.out.println("Bienvenue " + rs.getString("prenom") + " " + rs.getString("nom") + "\n");
+                System.out.println("Bienvenue " + rs.getString("prenom") + " " + rs.getString("nom"));
+                System.out.println("Rôle : " + role + "\n");
                 rs.close();
                 stmt.close();
                 return true;
@@ -231,6 +241,44 @@ public class Passerelle {
 
     public String getRoleConnecte() {
         return this.roleConnecte;
+    }
+
+    /**
+     * [ADMIN] Affiche toutes les réservations de tous les utilisateurs
+     */
+    public void afficherToutesLesReservations() {
+        try {
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT d.numero, d.datereserv, d.datedebut, d.duree, d.etat, " +
+                            "p.nom, p.prenom, v.marque, v.modele, v.immat " +
+                            "FROM demande d " +
+                            "JOIN personne p ON d.matricule = p.matricule " +
+                            "JOIN vehicule v ON d.immat = v.immat " +
+                            "ORDER BY d.datedebut DESC");
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("\n=== TOUTES LES RÉSERVATIONS [ADMIN] ===");
+            boolean trouve = false;
+            while (rs.next()) {
+                trouve = true;
+                System.out.println("\nRéservation N°" + rs.getInt("numero"));
+                System.out.println("  Employé          : " + rs.getString("prenom") + " " + rs.getString("nom"));
+                System.out.println("  Date réservation : " + rs.getDate("datereserv"));
+                System.out.println("  Date début       : " + rs.getDate("datedebut"));
+                System.out.println("  Durée            : " + rs.getInt("duree") + " jour(s)");
+                System.out.println("  Véhicule         : " + rs.getString("marque") + " " +
+                        rs.getString("modele") + " (" + rs.getString("immat") + ")");
+                System.out.println("  État             : " + rs.getString("etat"));
+            }
+
+            if (!trouve) {
+                System.out.println("Aucune réservation dans le système.");
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("❌ ERREUR - " + e.getMessage());
+        }
     }
 
     /**

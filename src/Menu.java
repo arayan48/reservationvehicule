@@ -9,21 +9,39 @@ public class Menu {
 
     public void afficherMenu(Scanner scanner, Passerelle db) {
         boolean continuer = true;
+        String role = db.getRoleConnecte();
+        boolean isAdmin = "role_admin".equals(role);
 
         while (continuer) {
             clearConsole();
             afficherBienvenue();
-            System.out.println("\n===== MENU PRINCIPAL =====");
+
+            if (isAdmin) {
+                System.out.println("\n===== MENU ADMINISTRATEUR =====");
+            } else {
+                System.out.println("\n===== MENU PRINCIPAL =====");
+            }
+
             System.out.println("1. Faire une réservation");
             System.out.println("2. Vérifier la disponibilité d'un véhicule");
             System.out.println("3. Modifier une réservation");
             System.out.println("4. Voir mes réservations");
+
+            if (isAdmin) {
+                System.out.println("5. Voir toutes les réservations [ADMIN]");
+            }
+
             System.out.println("0. Quitter");
 
             System.out.print("Veuillez choisir une option : ");
 
-            int choix = scanner.nextInt();
-            scanner.nextLine();
+            int choix;
+            try {
+                choix = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Option invalide. Veuillez réessayer.");
+                continue;
+            }
 
             switch (choix) {
                 case 1:
@@ -39,6 +57,15 @@ public class Menu {
                     db.afficherMesReservations("" + db.getMatriculeConnecte());
                     System.out.println("\nAppuyez sur Entrée pour continuer...");
                     scanner.nextLine();
+                    break;
+                case 5:
+                    if (isAdmin) {
+                        db.afficherToutesLesReservations();
+                        System.out.println("\nAppuyez sur Entrée pour continuer...");
+                        scanner.nextLine();
+                    } else {
+                        System.out.println("❌ Accès refusé - droits insuffisants.");
+                    }
                     break;
                 case 0:
                     System.out.println("Au revoir !");

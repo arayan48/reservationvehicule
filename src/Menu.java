@@ -10,7 +10,7 @@ public class Menu {
     public void afficherMenu(Scanner scanner, Passerelle db) {
         boolean continuer = true;
         String role = db.getRoleConnecte();
-        boolean isAdmin = "ROLE_ADMIN".equals(role);
+        boolean isAdmin = "Admin".equals(role);
 
         while (continuer) {
             clearConsole();
@@ -29,6 +29,7 @@ public class Menu {
 
             if (isAdmin) {
                 System.out.println("5. Voir toutes les réservations [ADMIN]");
+                System.out.println("6. Valider / Refuser des réservations [ADMIN]");
             }
 
             System.out.println("0. Quitter");
@@ -65,6 +66,13 @@ public class Menu {
                         db.afficherToutesLesReservations();
                         System.out.println("\nAppuyez sur Entrée pour continuer...");
                         scanner.nextLine();
+                    } else {
+                        System.out.println("❌ Accès refusé - droits insuffisants.");
+                    }
+                    break;
+                case 6:
+                    if (isAdmin) {
+                        menuValidationReservation(scanner, db);
                     } else {
                         System.out.println("❌ Accès refusé - droits insuffisants.");
                     }
@@ -304,6 +312,73 @@ public class Menu {
             }
         } catch (Exception e) {
             System.out.println("\n❌ ERREUR - " + e.getMessage());
+        }
+
+        System.out.println("\nAppuyez sur Entrée pour revenir au menu principal...");
+        s.nextLine();
+    }
+
+    public void menuValidationReservation(Scanner s, Passerelle db) {
+        clearConsole();
+        System.out.println("\n===== VALIDATION DES RESERVATIONS [ADMIN] =====");
+
+        db.afficherReservationsEnAttente();
+
+        System.out.println("\nEntrez le numéro de la réservation à traiter (0 pour annuler) : ");
+        int numero;
+        try {
+            numero = Integer.parseInt(s.nextLine().trim());
+        } catch (NumberFormatException ignored) {
+            System.out.println("❌ Numéro invalide.");
+            System.out.println("\nAppuyez sur Entrée pour revenir au menu principal...");
+            s.nextLine();
+            return;
+        }
+
+        if (numero == 0) {
+            return;
+        }
+
+        System.out.print("Date de la réservation (AAAA-MM-JJ) : ");
+        LocalDate datereserv;
+        try {
+            datereserv = LocalDate.parse(s.nextLine().trim());
+        } catch (Exception ignored) {
+            System.out.println("❌ Date invalide.");
+            System.out.println("\nAppuyez sur Entrée pour revenir au menu principal...");
+            s.nextLine();
+            return;
+        }
+
+        System.out.println("\nQue souhaitez-vous faire ?");
+        System.out.println("  1. Valider la réservation");
+        System.out.println("  2. Refuser la réservation");
+        System.out.println("  0. Annuler");
+        System.out.print("Votre choix : ");
+
+        int choix;
+        try {
+            choix = Integer.parseInt(s.nextLine().trim());
+        } catch (NumberFormatException ignored) {
+            System.out.println("❌ Choix invalide.");
+            System.out.println("\nAppuyez sur Entrée pour revenir au menu principal...");
+            s.nextLine();
+            return;
+        }
+
+        switch (choix) {
+            case 1:
+                db.validerReservation(numero, datereserv);
+                break;
+            case 2:
+                db.refuserReservation(numero, datereserv);
+                break;
+            case 0:
+                System.out.println("Opération annulée.");
+                break;
+            default:
+                System.out.println("❌ Choix invalide.");
+                break;
         }
 
         System.out.println("\nAppuyez sur Entrée pour revenir au menu principal...");

@@ -264,10 +264,10 @@ public class Passerelle {
         }
     }
 
-    public void afficherVehiculesParType(String noType) {
+    public void afficherVehiculesParType(int noType) {
         String sql = "SELECT immat, marque, modele FROM vehicule WHERE notype = ? ORDER BY marque, modele";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, noType);
+            stmt.setInt(1, noType);
             try (ResultSet rs = stmt.executeQuery()) {
                 boolean trouve = false;
                 while (rs.next()) {
@@ -326,7 +326,7 @@ public class Passerelle {
                    + "FROM demande d "
                    + "JOIN personne p ON d.matricule = p.matricule "
                    + "JOIN vehicule v ON d.immat = v.immat "
-                   + "JOIN type t ON d.notype = t.numero "
+                   + "JOIN type t ON d.notype = t.noType "
                    + "WHERE d.etat = 'En attente' "
                    + "ORDER BY d.datereserv ASC";
 

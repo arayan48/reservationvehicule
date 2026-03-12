@@ -9,14 +9,14 @@ import java.time.LocalDate;
 public class Passerelle {
 
     // ── Paramètres de connexion ─────────────────────────────────────────────
-    private static final String URL    = "jdbc:postgresql://slam2026_AP_rayanayyoubaymane";
-    private static final String USER   = "sbai";
+    private static final String URL = "jdbc:postgresql://192.168.1.245:5432/slam2026_AP_rayanayyoubaymane";
+    private static final String USER = "sbai";
     private static final String PASSWD = "sbaisbai";
 
     // ── État interne ────────────────────────────────────────────────────────
     private Connection conn = null;
-    private int    matriculeConnecte = 0;
-    private String roleConnecte      = null;
+    private int matriculeConnecte = 0;
+    private String roleConnecte = null;
 
     // ── Connexion à la base de données ──────────────────────────────────────
 
@@ -59,6 +59,7 @@ public class Passerelle {
     /**
      * Vérifie les identifiants de l'utilisateur.
      * Stocke le matricule et le rôle en majuscules si la connexion réussit.
+     * 
      * @return true si l'authentification est réussie
      */
     public boolean verifierConnexion(int matricule, String mdp) {
@@ -99,8 +100,13 @@ public class Passerelle {
 
     // ── Accesseurs ──────────────────────────────────────────────────────────
 
-    public int    getMatriculeConnecte() { return this.matriculeConnecte; }
-    public String getRoleConnecte()      { return this.roleConnecte; }
+    public int getMatriculeConnecte() {
+        return this.matriculeConnecte;
+    }
+
+    public String getRoleConnecte() {
+        return this.roleConnecte;
+    }
 
     @Override
     public String toString() {
@@ -112,7 +118,8 @@ public class Passerelle {
     // ── Requêtes metier ─────────────────────────────────────────────────────
 
     public Type recupererTypeParNumero(int numero) {
-        if (!isConnected()) return null;
+        if (!isConnected())
+            return null;
 
         String sql = "SELECT notype, libelle FROM type WHERE notype = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -134,8 +141,8 @@ public class Passerelle {
             LocalDate dateRetourEffectif, String etat) {
 
         String sql = "UPDATE demande SET datedebut = ?, matricule = ?, notype = ?, immat = ?, "
-                   + "duree = ?, dateretoureffectif = ?, etat = ? "
-                   + "WHERE numero = ? AND datereserv = ?";
+                + "duree = ?, dateretoureffectif = ?, etat = ? "
+                + "WHERE numero = ? AND datereserv = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, java.sql.Date.valueOf(dateDebut));
@@ -165,7 +172,7 @@ public class Passerelle {
 
     public boolean verifierReservation(String marque, String modele, Type unType, String immat) {
         String sql = "SELECT COUNT(*) FROM vehicule "
-                   + "WHERE marque = ? AND modele = ? AND noType = ? AND immat = ?";
+                + "WHERE marque = ? AND modele = ? AND noType = ? AND immat = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, marque);
             stmt.setString(2, modele);
@@ -190,7 +197,8 @@ public class Passerelle {
             stmt.setInt(1, numero);
             stmt.setObject(2, datereserv);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return rs.getInt(1) > 0;
+                if (rs.next())
+                    return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());
@@ -201,7 +209,7 @@ public class Passerelle {
     public boolean insererDemande(String datereserv, String datedebut, String matricule,
             String notype, String immat, int duree, String etat) {
         String sql = "INSERT INTO demande (datereserv, datedebut, matricule, notype, immat, duree, etat) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDate(1, java.sql.Date.valueOf(datereserv));
             stmt.setDate(2, java.sql.Date.valueOf(datedebut));
@@ -219,14 +227,14 @@ public class Passerelle {
 
     public void afficherToutesLesReservations() {
         String sql = "SELECT d.numero, d.datereserv, d.datedebut, d.duree, d.etat, "
-                   + "p.nom, p.prenom, v.marque, v.modele, v.immat "
-                   + "FROM demande d "
-                   + "JOIN personne p ON d.matricule = p.matricule "
-                   + "JOIN vehicule v ON d.immat = v.immat "
-                   + "ORDER BY d.datedebut DESC";
+                + "p.nom, p.prenom, v.marque, v.modele, v.immat "
+                + "FROM demande d "
+                + "JOIN personne p ON d.matricule = p.matricule "
+                + "JOIN vehicule v ON d.immat = v.immat "
+                + "ORDER BY d.datedebut DESC";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
 
             System.out.println("\n=== TOUTES LES RESERVATIONS [ADMIN] ===");
             boolean trouve = false;
@@ -241,7 +249,8 @@ public class Passerelle {
                         + rs.getString("modele") + " (" + rs.getString("immat") + ")");
                 System.out.println("  Etat             : " + rs.getString("etat"));
             }
-            if (!trouve) System.out.println("Aucune reservation dans le systeme.");
+            if (!trouve)
+                System.out.println("Aucune reservation dans le systeme.");
 
         } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());
@@ -255,7 +264,7 @@ public class Passerelle {
         }
         String sql = "SELECT notype, libelle FROM type ORDER BY notype";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 System.out.println("  " + rs.getInt("notype") + " - " + rs.getString("libelle"));
             }
@@ -275,7 +284,8 @@ public class Passerelle {
                     System.out.println("  " + rs.getString("immat") + " - "
                             + rs.getString("marque") + " " + rs.getString("modele"));
                 }
-                if (!trouve) System.out.println("  Aucun vehicule de ce type.");
+                if (!trouve)
+                    System.out.println("  Aucun vehicule de ce type.");
             }
         } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());
@@ -320,18 +330,18 @@ public class Passerelle {
 
     public void afficherReservationsEnAttente() {
         String sql = "SELECT d.numero, d.datereserv, d.datedebut, d.duree, "
-                   + "p.nom, p.prenom, p.matricule, "
-                   + "v.marque, v.modele, v.immat, "
-                   + "t.libelle AS typeLibelle "
-                   + "FROM demande d "
-                   + "JOIN personne p ON d.matricule = p.matricule "
-                   + "JOIN vehicule v ON d.immat = v.immat "
-                   + "JOIN type t ON d.notype = t.noType "
-                   + "WHERE d.etat = 'En attente' "
-                   + "ORDER BY d.datereserv ASC";
+                + "p.nom, p.prenom, p.matricule, "
+                + "v.marque, v.modele, v.immat, "
+                + "t.libelle AS typeLibelle "
+                + "FROM demande d "
+                + "JOIN personne p ON d.matricule = p.matricule "
+                + "JOIN vehicule v ON d.immat = v.immat "
+                + "JOIN type t ON d.notype = t.noType "
+                + "WHERE d.etat = 'En attente' "
+                + "ORDER BY d.datereserv ASC";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
 
             System.out.println("\n=== RESERVATIONS EN ATTENTE ===");
             boolean trouve = false;
@@ -347,7 +357,8 @@ public class Passerelle {
                 System.out.println("  Vehicule         : " + rs.getString("marque") + " "
                         + rs.getString("modele") + " (" + rs.getString("immat") + ")");
             }
-            if (!trouve) System.out.println("Aucune reservation en attente.");
+            if (!trouve)
+                System.out.println("Aucune reservation en attente.");
 
         } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());
@@ -356,7 +367,7 @@ public class Passerelle {
 
     public boolean validerReservation(int numero, LocalDate datereserv) {
         String sql = "UPDATE demande SET etat = 'Validee' "
-                   + "WHERE numero = ? AND datereserv = ? AND etat = 'En attente'";
+                + "WHERE numero = ? AND datereserv = ? AND etat = 'En attente'";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, numero);
             stmt.setDate(2, java.sql.Date.valueOf(datereserv));
@@ -376,7 +387,7 @@ public class Passerelle {
 
     public boolean refuserReservation(int numero, LocalDate datereserv) {
         String sql = "UPDATE demande SET etat = 'Refusee' "
-                   + "WHERE numero = ? AND datereserv = ? AND etat = 'En attente'";
+                + "WHERE numero = ? AND datereserv = ? AND etat = 'En attente'";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, numero);
             stmt.setDate(2, java.sql.Date.valueOf(datereserv));
@@ -396,11 +407,11 @@ public class Passerelle {
 
     public void afficherMesReservations(String matricule) {
         String sql = "SELECT d.numero, d.datereserv, d.datedebut, d.duree, d.etat, "
-                   + "v.marque, v.modele, v.immat "
-                   + "FROM demande d "
-                   + "JOIN vehicule v ON d.immat = v.immat "
-                   + "WHERE d.matricule = ? "
-                   + "ORDER BY d.datedebut DESC";
+                + "v.marque, v.modele, v.immat "
+                + "FROM demande d "
+                + "JOIN vehicule v ON d.immat = v.immat "
+                + "WHERE d.matricule = ? "
+                + "ORDER BY d.datedebut DESC";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, matricule);
@@ -417,7 +428,8 @@ public class Passerelle {
                             + rs.getString("modele") + " (" + rs.getString("immat") + ")");
                     System.out.println("  Etat             : " + rs.getString("etat"));
                 }
-                if (!trouve) System.out.println("Aucune reservation trouvee.");
+                if (!trouve)
+                    System.out.println("Aucune reservation trouvee.");
             }
         } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());

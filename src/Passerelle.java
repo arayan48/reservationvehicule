@@ -9,9 +9,9 @@ import java.time.LocalDate;
 public class Passerelle {
 
     // ── Paramètres de connexion ─────────────────────────────────────────────
-    private static final String URL    = "jdbc:postgresql://localhost:5432/reservation_vehicule_sio2";
-    private static final String USER   = "postgres";
-    private static final String PASSWD = "m7S0$]G1O3/£";
+    private static final String URL    = "jdbc:postgresql://slam2026_AP_rayanayyoubaymane";
+    private static final String USER   = "sbai";
+    private static final String PASSWD = "sbaisbai";
 
     // ── État interne ────────────────────────────────────────────────────────
     private Connection conn = null;

@@ -2,7 +2,7 @@
 *.md
 
 # Ignore all fil sh
-*.sh
+compile.sh
 
 # Ignore all jar files
 *.jar
@@ -12,3 +12,5 @@
 
 # ignore all sql files
 *.sql
+
+

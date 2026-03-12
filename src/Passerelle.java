@@ -9,9 +9,9 @@ import java.time.LocalDate;
 public class Passerelle {
 
     // ── Paramètres de connexion ─────────────────────────────────────────────
-    private static final String URL    = "jdbc:postgresql://192.168.1.24:5432/ReservationVehicule_SIO2";
-    private static final String USER   = "Rayan";
-    private static final String PASSWD = "Rayan789";
+    private static final String URL    = "jdbc:postgresql://localhost:5432/reservation_vehicule_sio2";
+    private static final String USER   = "postgres";
+    private static final String PASSWD = "m7S0$]G1O3/£";
 
     // ── État interne ────────────────────────────────────────────────────────
     private Connection conn = null;
@@ -114,12 +114,12 @@ public class Passerelle {
     public Type recupererTypeParNumero(int numero) {
         if (!isConnected()) return null;
 
-        String sql = "SELECT noType, libelle FROM type WHERE noType = ?";
+        String sql = "SELECT notype, libelle FROM type WHERE notype = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, numero);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Type(rs.getInt("noType"), rs.getString("libelle"));
+                    return new Type(rs.getInt("notype"), rs.getString("libelle"));
                 }
             }
         } catch (SQLException e) {
@@ -185,7 +185,7 @@ public class Passerelle {
     }
 
     public boolean reservationExiste(int numero, LocalDate datereserv) {
-        String sql = "SELECT COUNT(*) FROM demande WHERE nodemande = ? AND datereserv = ?";
+        String sql = "SELECT COUNT(*) FROM demande WHERE numero = ? AND datereserv = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, numero);
             stmt.setObject(2, datereserv);
@@ -253,11 +253,11 @@ public class Passerelle {
             System.out.println("Pas de connexion a la base de donnees.");
             return;
         }
-        String sql = "SELECT noType, libelle FROM type ORDER BY noType";
+        String sql = "SELECT notype, libelle FROM type ORDER BY notype";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                System.out.println("  " + rs.getInt("noType") + " - " + rs.getString("libelle"));
+                System.out.println("  " + rs.getInt("notype") + " - " + rs.getString("libelle"));
             }
         } catch (SQLException e) {
             System.out.println("ERREUR - " + e.getMessage());

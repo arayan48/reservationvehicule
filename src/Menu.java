@@ -168,7 +168,7 @@ public class Menu {
 
             // Afficher les véhicules disponibles de ce type
             System.out.println("\n--- Véhicules disponibles ---");
-            db.afficherVehiculesParType(noType);
+            db.afficherVehiculesParType(Integer.parseInt(noType));
             System.out.print("\nImmatriculation du véhicule : ");
             String immat = s.nextLine();
 
